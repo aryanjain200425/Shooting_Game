@@ -1,7 +1,6 @@
 import pygame
 import math
 import random
-import enemyClass as e
 import time
 import shutil
 import sys
@@ -11,6 +10,10 @@ pygame.init()
 
 # creating the screen
 screen = pygame.display.set_mode((800, 800))
+
+#Adding text Intitalization
+myfont = pygame.font.SysFont('Comic Sans MS', 30)
+
 
 # Title and caption
 
@@ -52,6 +55,8 @@ enemyAngle = 0
 
 collision = False
 
+score = 0
+
 
 def gunMovement(x, y):
     mouse_x, mouse_y = pygame.mouse.get_pos()
@@ -75,8 +80,9 @@ def collisionDetection(Px, Py, Ex, Ey):
     global collision
     counter = 0
     distance = math.sqrt((Px - Ex)**2 + (Py - Ey)**2)
-    if distance < 20:
+    if distance < 30:
         collision = True
+
 
 
 
@@ -94,6 +100,20 @@ def getAngle(x, y):
 
 def start(x, y):
     screen.blit(player, (x, y))
+    text = "KillS: {}".format(score)
+
+    if score == 20:
+        text = "YOU WIN"
+
+    textsurface = myfont.render(text, False, (0, 0, 0))
+    screen.blit(textsurface, (0, 0))
+
+
+    if score == 20:
+        screen.blit(myfont.render("YOU WIN", False, (0, 0, 0)), (0, 0))
+
+
+
 
 
 def shooting(x, y):
@@ -173,6 +193,12 @@ while running:
         enemyX += enemyX_change
         enemyY += enemyY_change
 
+    else:
+        collision = False
+        enemyX = random.randint(10, 790)
+        enemyY = random.randint(10, 790)
+        score += 10
+
     if isShooting:
         shooting(bulletX, bulletY)
 
@@ -189,9 +215,16 @@ while running:
 
     playerX += playerX_change
     playerY += playerY_change
+
     start(playerX, playerY)
 
+
     gunMovement(playerX, playerY)
+
+
+
     pygame.display.update()
 
+
 pygame.quit()
+sys.exit()
