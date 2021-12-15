@@ -31,7 +31,6 @@ playerGun = pygame.image.load("gun.png")
 gunX = 300
 gunY = 300
 
-
 # creating the bullet
 gun_bullet = pygame.image.load('bullet.png')
 bulletX = 0
@@ -46,11 +45,10 @@ velocity = 0.35
 enemy = pygame.image.load('ghost.png')
 enemyX = 0
 enemyY = 0
-enemy_speed = 0.0
+enemy_speed = 0.09
 enemyY_change = 0
 enemyX_change = 0
 enemyAngle = 0
-
 
 collision = False
 
@@ -65,15 +63,21 @@ def gunMovement(x, y):
 
 
 def enemyDisplay(x, y):
-
     rel_x, rel_y = playerX - x, playerY - y
     angle = (180 / math.pi) * -math.atan2(rel_y, rel_x)
     global enemyAngle
     enemyAngle = angle
 
-
-
     screen.blit(enemy, (x, y))
+
+
+def collisionDetection(Px, Py, Ex, Ey):
+    global collision
+    counter = 0
+    distance = math.sqrt((Px - Ex)**2 + (Py - Ey)**2)
+    if distance < 20:
+        collision = True
+
 
 
 
@@ -158,6 +162,7 @@ while running:
             if event.button == 3:
                 isShooting = False
 
+    collisionDetection(bulletX, bulletY, enemyX, enemyY)
 
     if not collision:
         enemyDisplay(enemyX, enemyY)
@@ -167,7 +172,6 @@ while running:
 
         enemyX += enemyX_change
         enemyY += enemyY_change
-
 
     if isShooting:
         shooting(bulletX, bulletY)
@@ -179,9 +183,9 @@ while running:
         bulletX += bulletX_change
         bulletY += bulletY_change
 
-    if not isShooting:
-        bulletY_change = 0
-        bulletX_change = 0
+    # if not isShooting:
+    #     bulletY_change = 0
+    #     bulletX_change = 0
 
     playerX += playerX_change
     playerY += playerY_change
