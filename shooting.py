@@ -102,15 +102,17 @@ def start(x, y):
     screen.blit(player, (x, y))
     text = "KillS: {}".format(score)
 
-    if score == 20:
+    if score == 50:
         text = "YOU WIN"
 
     textsurface = myfont.render(text, False, (0, 0, 0))
     screen.blit(textsurface, (0, 0))
 
 
-    if score == 20:
+    if score == 50:
+        global running
         screen.blit(myfont.render("YOU WIN", False, (0, 0, 0)), (0, 0))
+        running = False
 
 
 
@@ -219,6 +221,8 @@ while running:
     start(playerX, playerY)
 
 
+
+
     gunMovement(playerX, playerY)
 
 
@@ -226,5 +230,6 @@ while running:
     pygame.display.update()
 
 
+time.sleep(9)
 pygame.quit()
 sys.exit()
