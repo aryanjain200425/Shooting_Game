@@ -2,7 +2,7 @@ import pygame
 import math
 import random
 import time
-import shutil
+import enemyClass as e
 import sys
 
 # intitalizing pygame
@@ -11,9 +11,8 @@ pygame.init()
 # creating the screen
 screen = pygame.display.set_mode((800, 800))
 
-#Adding text Intitalization
+# Adding text Intitalization
 myfont = pygame.font.SysFont('Comic Sans MS', 30)
-
 
 # Title and caption
 
@@ -25,7 +24,7 @@ pygame.display.set_icon(icon)
 player = pygame.image.load("ufo.png")
 playerX = 400
 playerY = 400
-player_speed = 0.15
+player_speed = 0.12
 playerX_change = 0
 playerY_change = 0
 
@@ -46,16 +45,27 @@ velocity = 0.35
 # creating the enemy
 # enemy = []
 enemy = pygame.image.load('ghost.png')
-enemyX = 0
-enemyY = 0
-enemy_speed = 0.09
-enemyY_change = 0
-enemyX_change = 0
-enemyAngle = 0
+# enemyX = 0
+# enemyY = 0
+enemy_speed = 0.12
+# enemyY_change = 0
+# enemyX_change = 0
+# enemyAngle = 0
 
-collision = False
+enemy2 = pygame.image.load('ghost2.png')
+# enemyX2 = 30
+# enemyY2 = 100
+# enemy_speed2 = 0.12
+# enemyY_change2 = 0
+# enemyX_change2 = 0
+# enemyAngle2 = 0
+
+enemies = [e.Enemy(random.randint(10, 790), random.randint(10, 790), 0, enemy),
+           e.Enemy(random.randint(10, 790), random.randint(10, 790), 0, enemy2)]
 
 score = 0
+
+killsToWin = 10
 
 
 def gunMovement(x, y):
@@ -67,25 +77,19 @@ def gunMovement(x, y):
     screen.blit(gun, (x, y))
 
 
-def enemyDisplay(x, y):
+def enemyDisplay(x, y, enemyPic):
     rel_x, rel_y = playerX - x, playerY - y
     angle = (180 / math.pi) * -math.atan2(rel_y, rel_x)
-    global enemyAngle
-    enemyAngle = angle
-
-    screen.blit(enemy, (x, y))
+    screen.blit(enemyPic, (x, y))
+    return angle
 
 
 def collisionDetection(Px, Py, Ex, Ey):
-    global collision
-    counter = 0
-    distance = math.sqrt((Px - Ex)**2 + (Py - Ey)**2)
+    distance = math.sqrt((Px - Ex) ** 2 + (Py - Ey) ** 2)
     if distance < 30:
-        collision = True
-
-
-
-
+        return True
+    else:
+        return False
 
 
 def getAngle(x, y):
@@ -102,20 +106,20 @@ def start(x, y):
     screen.blit(player, (x, y))
     text = "KillS: {}".format(score)
 
-    if score == 50:
+    if score == killsToWin:
         text = "YOU WIN"
 
     textsurface = myfont.render(text, False, (0, 0, 0))
     screen.blit(textsurface, (0, 0))
 
-
-    if score == 50:
-        global running
+    if score == killsToWin * 10:
         screen.blit(myfont.render("YOU WIN", False, (0, 0, 0)), (0, 0))
-        running = False
+        endGame()
 
 
-
+def endGame():
+    global running
+    running = False
 
 
 def shooting(x, y):
@@ -129,8 +133,7 @@ def shooting(x, y):
 isShooting = False
 # game loop
 running = True
-enemyX = random.randint(10, 790)
-enemyY = random.randint(10, 790)
+
 while running:
     screen.fill((41, 38, 38))
 
@@ -184,52 +187,50 @@ while running:
             if event.button == 3:
                 isShooting = False
 
-    collisionDetection(bulletX, bulletY, enemyX, enemyY)
+    for e in enemies:
+        collision = collisionDetection(bulletX, bulletY, e.xCoor, e.yCoor)
 
-    if not collision:
-        enemyDisplay(enemyX, enemyY)
-        enemyX_change = math.cos(-math.pi / 180 * enemyAngle) * enemy_speed
+        if not collision:
+            enemyAngle = enemyDisplay(e.xCoor, e.yCoor, e.image)
+            e.setAngle(enemyAngle)
+            enemyX_change = math.cos(-math.pi / 180 * e.angle) * enemy_speed
 
-        enemyY_change = math.sin(-math.pi / 180 * enemyAngle) * enemy_speed
+            enemyY_change = math.sin(-math.pi / 180 * e.angle) * enemy_speed
 
-        enemyX += enemyX_change
-        enemyY += enemyY_change
-
-    else:
-        collision = False
-        enemyX = random.randint(10, 790)
-        enemyY = random.randint(10, 790)
-        score += 10
-
-    if isShooting:
-        shooting(bulletX, bulletY)
-
-        bulletX_change = math.cos(-math.pi / 180 * bullet_angle) * velocity
-
-        bulletY_change = math.sin(-math.pi / 180 * bullet_angle) * velocity
-
-        bulletX += bulletX_change
-        bulletY += bulletY_change
-
-    # if not isShooting:
-    #     bulletY_change = 0
-    #     bulletX_change = 0
-
-    playerX += playerX_change
-    playerY += playerY_change
-
-    start(playerX, playerY)
+            e.changeX(enemyX_change)
+            e.changeY(enemyY_change)
 
 
+        else:
+            e.setX(random.randint(10, 790))
+            e.setY(random.randint(10, 790))
 
+            score += 1
+
+        if isShooting:
+            shooting(bulletX, bulletY)
+
+            bulletX_change = math.cos(-math.pi / 180 * bullet_angle) * velocity
+
+            bulletY_change = math.sin(-math.pi / 180 * bullet_angle) * velocity
+
+            bulletX += bulletX_change
+            bulletY += bulletY_change
+
+        playerX += playerX_change
+        playerY += playerY_change
+
+        start(playerX, playerY)
+
+        if collisionDetection(playerX, playerY, e.xCoor, e.yCoor):
+            textsurface = myfont.render("YOU LOSE", False, (0, 0, 0))
+            screen.blit(textsurface, (100, 100))
+            endGame()
 
     gunMovement(playerX, playerY)
 
-
-
     pygame.display.update()
 
-
-time.sleep(9)
+time.sleep(3)
 pygame.quit()
 sys.exit()
