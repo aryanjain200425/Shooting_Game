@@ -96,8 +96,8 @@ def start(x, y):
     screen.blit(player, (x, y))
     text = "KillS: {}".format(score)
 
-    if score == killsToWin:
-        text = "YOU WIN"
+    # if score == killsToWin:
+    #     text = "YOU WIN"
 
     textsurface = myfont.render(text, False, (0, 0, 0))
     screen.blit(textsurface, (0, 0))
