@@ -25,7 +25,7 @@ pygame.display.set_icon(icon)
 player = pygame.image.load("ufo.png")
 playerX = 400
 playerY = 400
-player_speed = 1
+player_speed = 1.5
 playerX_change = 0
 playerY_change = 0
 
@@ -41,13 +41,13 @@ bulletY = 0
 bulletX_change = 0
 bulletY_change = 0
 bullet_angle = 0
-velocity = 1
+velocity = 4
 
 # creating the enemy
 
 enemy = pygame.image.load('ghost.png')
 
-enemy_speed = 1
+enemy_speed = 1.5
 
 
 enemies = [e.Enemy(random.randint(10, 790), random.randint(10, 790), 0, enemy),
