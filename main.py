@@ -4,6 +4,7 @@ import random
 import time
 import enemyClass as e
 import sys
+import asyncio
 
 # intitalizing pygame
 pygame.init()
@@ -24,7 +25,7 @@ pygame.display.set_icon(icon)
 player = pygame.image.load("ufo.png")
 playerX = 400
 playerY = 400
-player_speed = 0.12
+player_speed = 1
 playerX_change = 0
 playerY_change = 0
 
@@ -40,13 +41,13 @@ bulletY = 0
 bulletX_change = 0
 bulletY_change = 0
 bullet_angle = 0
-velocity = 0.35
+velocity = 1
 
 # creating the enemy
 
 enemy = pygame.image.load('ghost.png')
 
-enemy_speed = 0.12
+enemy_speed = 1
 
 
 enemies = [e.Enemy(random.randint(10, 790), random.randint(10, 790), 0, enemy),
@@ -123,103 +124,107 @@ isShooting = False
 # game loop
 running = True
 
-while running:
-    screen.fill((41, 38, 38))
+async def main():
+    global running, bulletX, bulletX_change, bulletY, bulletX_change, isShooting, playerX, playerX_change, playerY, playerY_change, score
 
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
-            sys.exit()
-        if event.type == pygame.KEYDOWN:
+    while running:
+        screen.fill((41, 38, 38))
 
-            # WASD
-            if event.key == pygame.K_d:
-                playerX_change = player_speed
-            if event.key == pygame.K_a:
-                playerX_change = -player_speed
-            if event.key == pygame.K_s:
-                playerY_change = player_speed
-            if event.key == pygame.K_w:
-                playerY_change = -player_speed
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+                sys.exit()
+            if event.type == pygame.KEYDOWN:
 
-            # ARROW kEYS
-            # if event.key == pygame.K_RIGHT:
-            #     playerX_change = 0.1
-            # if event.key == pygame.K_LEFT:
-            #     playerX_change = -0.1
-            # if event.key == pygame.K_DOWN:
-            #     playerY_change = 0.1
-            # if event.key == pygame.K_UP:
-            #     playerY_change = -0.1
+                # WASD
+                if event.key == pygame.K_d:
+                    playerX_change = player_speed
+                if event.key == pygame.K_a:
+                    playerX_change = -player_speed
+                if event.key == pygame.K_s:
+                    playerY_change = player_speed
+                if event.key == pygame.K_w:
+                    playerY_change = -player_speed
 
-        if event.type == pygame.KEYUP:
+                # ARROW kEYS
+                # if event.key == pygame.K_RIGHT:
+                #     playerX_change = 0.1
+                # if event.key == pygame.K_LEFT:
+                #     playerX_change = -0.1
+                # if event.key == pygame.K_DOWN:
+                #     playerY_change = 0.1
+                # if event.key == pygame.K_UP:
+                #     playerY_change = -0.1
 
-            # ARROW kEYS
-            # if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
-            #     playerX_change = 0
-            # if event.key == pygame.K_UP or event.key == pygame.K_DOWN:
-            #     playerY_change = 0
-            # WASD
-            if event.key == pygame.K_a or event.key == pygame.K_d:
-                playerX_change = 0
-            if event.key == pygame.K_w or event.key == pygame.K_s:
-                playerY_change = 0
+            if event.type == pygame.KEYUP:
 
-        if event.type == pygame.MOUSEBUTTONDOWN:
+                # ARROW kEYS
+                # if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
+                #     playerX_change = 0
+                # if event.key == pygame.K_UP or event.key == pygame.K_DOWN:
+                #     playerY_change = 0
+                # WASD
+                if event.key == pygame.K_a or event.key == pygame.K_d:
+                    playerX_change = 0
+                if event.key == pygame.K_w or event.key == pygame.K_s:
+                    playerY_change = 0
 
-            if event.button == 1:
-                getAngle(playerX, playerY)
+            if event.type == pygame.MOUSEBUTTONDOWN:
 
-                bulletY = playerY
-                bulletX = playerX
-                isShooting = True
-            if event.button == 3:
-                isShooting = False
+                if event.button == 1:
+                    getAngle(playerX, playerY)
 
-    for e in enemies:
-        collision = collisionDetection(bulletX, bulletY, e.xCoor, e.yCoor)
+                    bulletY = playerY
+                    bulletX = playerX
+                    isShooting = True
+                if event.button == 3:
+                    isShooting = False
 
-        if not collision:
-            enemyAngle = enemyDisplay(e.xCoor, e.yCoor, e.image)
-            e.setAngle(enemyAngle)
-            enemyX_change = math.cos(-math.pi / 180 * e.angle) * enemy_speed
+        for e in enemies:
+            collision = collisionDetection(bulletX, bulletY, e.xCoor, e.yCoor)
 
-            enemyY_change = math.sin(-math.pi / 180 * e.angle) * enemy_speed
+            if not collision:
+                enemyAngle = enemyDisplay(e.xCoor, e.yCoor, e.image)
+                e.setAngle(enemyAngle)
+                enemyX_change = math.cos(-math.pi / 180 * e.angle) * enemy_speed
 
-            e.changeX(enemyX_change)
-            e.changeY(enemyY_change)
+                enemyY_change = math.sin(-math.pi / 180 * e.angle) * enemy_speed
+
+                e.changeX(enemyX_change)
+                e.changeY(enemyY_change)
 
 
-        else:
-            e.setX(random.randint(10, 790))
-            e.setY(random.randint(10, 790))
+            else:
+                e.setX(random.randint(10, 790))
+                e.setY(random.randint(10, 790))
 
-            score += 1
+                score += 1
 
-        if isShooting:
-            shooting(bulletX, bulletY)
+            if isShooting:
+                shooting(bulletX, bulletY)
 
-            bulletX_change = math.cos(-math.pi / 180 * bullet_angle) * velocity
+                bulletX_change = math.cos(-math.pi / 180 * bullet_angle) * velocity
 
-            bulletY_change = math.sin(-math.pi / 180 * bullet_angle) * velocity
+                bulletY_change = math.sin(-math.pi / 180 * bullet_angle) * velocity
 
-            bulletX += bulletX_change
-            bulletY += bulletY_change
+                bulletX += bulletX_change
+                bulletY += bulletY_change
 
-        playerX += playerX_change
-        playerY += playerY_change
+            playerX += playerX_change
+            playerY += playerY_change
 
-        start(playerX, playerY)
+            start(playerX, playerY)
 
-        if collisionDetection(playerX, playerY, e.xCoor, e.yCoor):
-            textsurface = myfont.render("YOU LOSE", False, (0, 0, 0))
-            screen.blit(textsurface, (100, 100))
-            endGame()
+            if collisionDetection(playerX, playerY, e.xCoor, e.yCoor):
+                textsurface = myfont.render("YOU LOSE", False, (0, 0, 0))
+                screen.blit(textsurface, (100, 100))
+                endGame()
 
-    gunMovement(playerX, playerY)
+        gunMovement(playerX, playerY)
 
-    pygame.display.update()
+        pygame.display.update()
+        await asyncio.sleep(0)
 
-time.sleep(3)
-pygame.quit()
-sys.exit()
+
+asyncio.run(main())
+
