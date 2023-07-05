@@ -41,7 +41,7 @@ bulletY = 0
 bulletX_change = 0
 bulletY_change = 0
 bullet_angle = 0
-velocity = 4
+velocity = 8
 
 # creating the enemy
 
