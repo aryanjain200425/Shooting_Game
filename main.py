@@ -43,25 +43,14 @@ bullet_angle = 0
 velocity = 0.35
 
 # creating the enemy
-# enemy = []
-enemy = pygame.image.load('ghost.png')
-# enemyX = 0
-# enemyY = 0
-enemy_speed = 0.12
-# enemyY_change = 0
-# enemyX_change = 0
-# enemyAngle = 0
 
-enemy2 = pygame.image.load('ghost2.png')
-# enemyX2 = 30
-# enemyY2 = 100
-# enemy_speed2 = 0.12
-# enemyY_change2 = 0
-# enemyX_change2 = 0
-# enemyAngle2 = 0
+enemy = pygame.image.load('ghost.png')
+
+enemy_speed = 0.12
+
 
 enemies = [e.Enemy(random.randint(10, 790), random.randint(10, 790), 0, enemy),
-           e.Enemy(random.randint(10, 790), random.randint(10, 790), 0, enemy2)]
+           e.Enemy(random.randint(10, 790), random.randint(10, 790), 0, enemy)]
 
 score = 0
 
